@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CALC+ · two page · top currency grid</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      margin: 0;
+    }
+
+    body {
+      background: #1a232f;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .phone-frame {
+      background: #0d121c;
+      border-radius: 3rem;
+      box-shadow: 0 25px 50px -8px black, 0 0 0 2px #2e425b inset;
+      width: 100%;
+      max-width: 560px;
+      padding: 2rem 1.5rem 2rem;
+      position: relative;
+    }
+
+    /* page tabs */
+    .page-tabs {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 2rem;
+      background: #1d2a38;
+      padding: 0.5rem;
+      border-radius: 4rem;
+      border: 1px solid #3e5770;
+    }
+
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 0.9rem 0;
+      border-radius: 3rem;
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: 0.02rem;
+      color: #a6c5e5;
+      cursor: pointer;
+      transition: 0.15s;
+      border: none;
+      background: transparent;
+    }
+
+    .tab.active {
+      background: #2c405b;
+      color: white;
+      box-shadow: 0 4px 0 #0b1725;
+      border: 1px solid #5f83aa;
+    }
+
+    .pages {
+      position: relative;
+      min-height: 620px;
+    }
+
+    .page {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.18s;
+      width: 100%;
+    }
+
+    .page.active-page {
+      display: block;
+      opacity: 1;
+    }
+
+    /* ---------- SCIENTIFIC PAGE ---------- */
+    .sci-panel {
+      background: #19232f;
+      border-radius: 2rem;
+      padding: 1.2rem;
+      border: 1px solid #38536b;
+      box-shadow: 0 8px 0 #0b141e;
+    }
+
+    .sci-display {
+      background: #111c29;
+      border-radius: 2rem;
+      padding: 2rem 1.5rem 1.2rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid #2b4a64;
+      text-align: right;
+      word-break: break-word;
+      box-shadow: inset 0 2px 6px #00000060;
+    }
+
+    .sci-expression {
+      font-size: 1.1rem;
+      color: #99bce3;
+      min-height: 1.8rem;
+      font-family: 'Fira Code', monospace;
+    }
+
+    .sci-input {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: white;
+      line-height: 1.2;
+    }
+
+    .sci-buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.7rem;
+    }
+
+    .sci-btn {
+      background: #26374b;
+      border: none;
+      border-radius: 2rem;
+      padding: 1rem 0.2rem;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #ebf3ff;
+      box-shadow: 0 4px 0 #11202f;
+      cursor: pointer;
+      border: 1px solid #3e6082;
+      transition: 0.05s linear;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sci-btn:active {
+      transform: translateY(4px);
+      box-shadow: none;
+    }
+
+    .sci-btn.fn {
+      background: #1c3f5c;
+      color: #daf0ff;
+      font-size: 1.1rem;
+    }
+
+    .sci-btn.operator {
+      background: #345f83;
+      font-size: 1.6rem;
+    }
+
+    .sci-btn.equals {
+      background: #1e6d8f;
+      grid-column: span 2;
+      font-size: 2rem;
+    }
+
+    .sci-btn.clear {
+      background: #663f3f;
+      border-color: #b07c7c;
+    }
+
+    /* ---------- CURRENCY PAGE (with top grid) ---------- */
+    .currency-panel {
+      background: #0e1a27;
+      border-radius: 2rem;
+      padding: 1.5rem 1rem;
+      border: 2px solid #3c6185;
+    }
+
+    .error-note {
+      background: #4f2929;
+      color: #ffc5b5;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .error-note.show { display: block; }
+
+    /* top grid : exactly as image: 4x5 currencies */
+    .top-currency-grid {
+      background: #102433;
+      border-radius: 2rem;
+      padding: 1.2rem 0.8rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid #4c7bb0;
+      box-shadow: 0 6px 0 #0a1a2b;
+    }
+
+    .grid-title {
+      color: #b3d6ff;
+      font-size: 0.85rem;
+      margin-bottom: 0.8rem;
+      padding-left: 0.5rem;
+      letter-spacing: 0.1rem;
+    }
+
+    .currency-grid-4x5 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+    }
+
+    .grid-currency-btn {
+      background: #1d3a55;
+      border: 1px solid #5882b5;
+      border-radius: 2rem;
+      padding: 0.6rem 0.2rem;
+      color: white;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.1s;
+      box-shadow: 0 3px 0 #0c1f32;
+    }
+
+    .grid-currency-btn.selected {
+      background: #2f6ea2;
+      border-color: #aad0ff;
+      box-shadow: 0 0 0 2px #b3dbff, 0 3px 0 #1a3e60;
+      color: white;
+      font-weight: 700;
+    }
+
+    /* you pay row with amount */
+    .pay-row {
+      background: #142433;
+      border-radius: 2rem;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1rem;
+      border: 1px solid #4b739b;
+      box-shadow: 0 5px 0 #0b1725;
+    }
+
+    .pay-label {
+      font-size: 0.75rem;
+      color: #afcbff;
+      letter-spacing: 0.1rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .pay-input-area {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .pay-input-area input {
+      background: #010a14;
+      border: 1px solid #50789c;
+      border-radius: 3rem;
+      padding: 1rem 1.2rem;
+      font-size: 2rem;
+      font-weight: 700;
+      color: white;
+      width: 100%;
+      outline: none;
+    }
+
+    .pay-input-area input::placeholder {
+      color: #3f6085;
+    }
+
+    /* swap */
+    .swap-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 0.5rem 0;
+    }
+
+    .swap-btn {
+      background: #264f72;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 1.8rem;
+      color: white;
+      cursor: pointer;
+      border: 2px solid #70a5da;
+      box-shadow: 0 5px 0 #12324b;
+    }
+
+    .swap-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 #12324b;
+    }
+
+    /* target / result panel with big currency display */
+    .result-super {
+      background: #001d2b;
+      border-radius: 2rem;
+      margin: 1rem 0 1.2rem;
+      padding: 1.5rem 1.5rem;
+      border: 3px solid #23c5b7;
+      box-shadow: 0 8px 0 #05353b;
+    }
+
+    .result-main-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .result-number {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #b5fff0;
+      text-shadow: 0 2px 8px #008a9c;
+    }
+
+    .result-currency-big {
+      background: #10635c;
+      padding: 0.8rem 2rem;
+      border-radius: 4rem;
+      font-size: 2rem;
+      font-weight: 700;
+      color: white;
+      border: 2px solid #6df0e0;
+      box-shadow: 0 4px 0 #07423e;
+    }
+
+    .rate-info {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1rem;
+      background: #003949;
+      padding: 0.7rem 1.5rem;
+      border-radius: 3rem;
+      color: #9ef7ea;
+      justify-content: center;
+      font-size: 0.95rem;
+    }
+
+    /* bottom extra grid (quick pick) */
+    .bottom-grid {
+      margin-top: 1rem;
+      background: #0f202f;
+      border-radius: 2rem;
+      padding: 1rem;
+      border: 1px solid #407199;
+    }
+
+    .bottom-badge-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .bottom-badge {
+      background: #1a3852;
+      border: 1px solid #5f8fc0;
+      color: #dbf0ff;
+      padding: 0.4rem 1.1rem;
+      border-radius: 2rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .bottom-badge:hover {
+      background: #2d5580;
+      color: white;
+    }
+
+    .attribution {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+      color: #4c7694;
+      font-size: 0.7rem;
+    }
+  </style>
+</head>
+<body>
+<div class="phone-frame">
+  <!-- tabs -->
+  <div class="page-tabs">
+    <button class="tab active" id="tabSci">🔬 scientific</button>
+    <button class="tab" id="tabCurr">💱 currency</button>
+  </div>
+
+  <div class="pages">
+    <!-- PAGE 1 - SCIENTIFIC (same as before) -->
+    <div class="page active-page" id="pageSci">
+      <div class="sci-panel">
+        <div class="sci-display">
+          <div class="sci-expression" id="sciExpr"></div>
+          <div class="sci-input" id="sciInput">0</div>
+        </div>
+        <div class="sci-buttons" id="sciButtons"></div>
+      </div>
+    </div>
+
+    <!-- PAGE 2 - CURRENCY (with top grid to change from-currency) -->
+    <div class="page" id="pageCurr">
+      <div class="currency-panel">
+        <div class="error-note" id="currError"><span>⚠️</span> <span id="currErrorText">using fallback</span></div>
+
+        <!-- TOP GRID: exactly as image (USD, EUR, GBP, JPY, CHF / CAD, AUD, CNY, INR, BRL / KRW, MXN, SGD, NZD, ZAR / TRY, SEK, NOK, RUB, PLN) -->
+        <div class="top-currency-grid">
+          <div class="grid-title">▼ click to set YOUR PAY currency</div>
+          <div class="currency-grid-4x5" id="topCurrencyGrid">
+            <!-- dynamically filled from array -->
+          </div>
+        </div>
+
+        <!-- you pay amount row -->
+        <div class="pay-row">
+          <div class="pay-label">⬇️ YOU PAY</div>
+          <div class="pay-input-area">
+            <input type="text" id="payAmount" value="1.00" placeholder="0.00">
+          </div>
+        </div>
+
+        <!-- swap -->
+        <div class="swap-wrap">
+          <button class="swap-btn" id="swapCurrencyBtn">⇅</button>
+        </div>
+
+        <!-- receive row (simplified badge) -->
+        <div class="pay-row" style="background: #0e1f30;">
+          <div class="pay-label">⬆️ YOU RECEIVE</div>
+          <div class="pay-input-area" style="justify-content: space-between;">
+            <span style="font-size:2rem; font-weight:700; color:#dcf5ff;" id="receiveAmount">0.00</span>
+            <span style="background:#1e4b6e; padding:0.7rem 1.8rem; border-radius:3rem; font-size:1.6rem; font-weight:700; color:white; border:2px solid #4797c5;" id="targetBadge">EUR</span>
+          </div>
+        </div>
+
+        <!-- result super visible -->
+        <div class="result-super">
+          <div class="result-main-row">
+            <span class="result-number" id="convAmount">0.00</span>
+            <span class="result-currency-big" id="targetLarge">EUR</span>
+          </div>
+          <div class="rate-info" id="rateDetails">
+            <span id="rateLeft">1 USD = 0.93 EUR</span>
+            <span id="rateRight">1 EUR = 1.08 USD</span>
+          </div>
+        </div>
+
+        <!-- bottom extra currency grid (all currencies as clickable to set target) -->
+        <div class="bottom-grid">
+          <div class="bottom-badge-container" id="allCurrencyGrid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="attribution">
+    <span>⚡ live rates · grid changes top currency</span>
+    <span>v3</span>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ----- CURRENCY LISTS -----
+    const TOP_GRID_CURRENCIES = [
+       "USD", "EUR", "GBP", "JPY", "CHF", "CAD", "AUD", "CNY", "INR", "BRL",
+      "KRW", "MXN", "SGD", "NZD", "ZAR", "TRY", "SEK", "NOK", "RUB", "PLN",
+      "HKD", "THB", "IDR", "MYR", "PHP", "CZK", "DKK", "HUF", "ILS", "CLP",
+      "PKR", "BDT", "KES", "NGN", "EGP", "VND", "UAH", "QAR", "SAR", "AED"
+
+    ];
+
+    const FULL_CURRENCIES = [
+      "USD", "EUR", "GBP", "JPY", "CHF", "CAD", "AUD", "CNY", "INR", "BRL",
+      "KRW", "MXN", "SGD", "NZD", "ZAR", "TRY", "SEK", "NOK", "RUB", "PLN",
+      "HKD", "THB", "IDR", "MYR", "PHP", "CZK", "DKK", "HUF", "ILS", "CLP",
+      "PKR", "BDT", "KES", "NGN", "EGP", "VND", "UAH", "QAR", "SAR", "AED"
+    ];
+
+    // Fallback rates (ensure every currency has a value)
+    const FALLBACK = {
+      USD:1, EUR:0.93, GBP:0.79, JPY:150.5, CHF:0.88, CAD:1.37, AUD:1.53, CNY:7.19, INR:83.2, BRL:5.41,
+      KRW:1350, MXN:17.1, SGD:1.35, NZD:1.66, ZAR:18.9, TRY:32.3, SEK:10.6, NOK:10.8, RUB:92.5, PLN:4.02,
+      HKD:7.82, THB:36.1, IDR:15800, MYR:4.75, PHP:56.3, CZK:23.2, DKK:6.95, HUF:363, ILS:3.68, CLP:970,
+      PKR:278, BDT:117, KES:145, NGN:1480, EGP:47.8, VND:25400, UAH:39.2, QAR:3.64, SAR:3.75, AED:3.67
+    };
+    FULL_CURRENCIES.forEach(c => { if (!FALLBACK[c]) FALLBACK[c] = 1.0; });
+
+    // state
+    let rates = { ...FALLBACK };
+    let useFallback = true;
+    let fromCurrency = 'USD';
+    let toCurrency = 'EUR';
+
+    // DOM elements
+    const topGrid = document.getElementById('topCurrencyGrid');
+    const allGrid = document.getElementById('allCurrencyGrid');
+    const payAmount = document.getElementById('payAmount');
+    const receiveSpan = document.getElementById('receiveAmount');
+    const convAmount = document.getElementById('convAmount');
+    const targetLarge = document.getElementById('targetLarge');
+    const targetBadge = document.getElementById('targetBadge');
+    const rateLeft = document.getElementById('rateLeft');
+    const rateRight = document.getElementById('rateRight');
+    const currError = document.getElementById('currError');
+    const currErrorText = document.getElementById('currErrorText');
+    const swapBtn = document.getElementById('swapCurrencyBtn');
+
+    // ----- render top grid (FROM currency changer) -----
+    function renderTopGrid() {
+      topGrid.innerHTML = '';
+      TOP_GRID_CURRENCIES.forEach(code => {
+        const btn = document.createElement('div');
+        btn.className = `grid-currency-btn ${code === fromCurrency ? 'selected' : ''}`;
+        btn.textContent = code;
+        btn.dataset.code = code;
+        btn.addEventListener('click', () => {
+          fromCurrency = code;
+          renderTopGrid();        // re-render to show selected
+          renderBottomGrid();      // not strictly needed, but consistent
+          updateConversion();
+        });
+        topGrid.appendChild(btn);
+      });
+    }
+
+    // ----- render bottom grid (all currencies, click sets TO currency) -----
+    function renderBottomGrid() {
+      allGrid.innerHTML = '';
+      FULL_CURRENCIES.forEach(code => {
+        const badge = document.createElement('span');
+        badge.className = 'bottom-badge';
+        badge.textContent = code;
+        badge.addEventListener('click', () => {
+          toCurrency = code;
+          renderBottomGrid();
+          targetLarge.textContent = toCurrency;
+          targetBadge.textContent = toCurrency;
+          updateConversion();
+        });
+        allGrid.appendChild(badge);
+      });
+    }
+
+    // ----- conversion & update -----
+    function convert(amount, from, to) {
+      if (!rates[from] || !rates[to]) return amount;
+      return (amount / rates[from]) * rates[to];
+    }
+
+    function updateConversion() {
+      const amount = parseFloat(payAmount.value) || 0;
+      const result = convert(amount, fromCurrency, toCurrency);
+      receiveSpan.innerText = result.toFixed(2);
+      convAmount.innerText = result.toFixed(2);
+      targetLarge.innerText = toCurrency;
+      targetBadge.innerText = toCurrency;
+
+      const oneFrom = convert(1, fromCurrency, toCurrency);
+      const oneTo = convert(1, toCurrency, fromCurrency);
+      rateLeft.innerText = `1 ${fromCurrency} = ${oneFrom.toFixed(4)} ${toCurrency}`;
+      rateRight.innerText = `1 ${toCurrency} = ${oneTo.toFixed(4)} ${fromCurrency}`;
+    }
+
+    // ----- fetch live rates -----
+    async function fetchRates() {
+      try {
+        const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        if (!res.ok) throw new Error('fetch failed');
+        const data = await res.json();
+        rates = data.rates;
+        useFallback = false;
+        currError.classList.remove('show');
+      } catch (e) {
+        rates = { ...FALLBACK };
+        useFallback = true;
+        currErrorText.innerText = 'Live rates failed, using fallback.';
+        currError.classList.add('show');
+      }
+      updateConversion();
+    }
+
+    // event listeners
+    payAmount.addEventListener('input', updateConversion);
+    swapBtn.addEventListener('click', () => {
+      [fromCurrency, toCurrency] = [toCurrency, fromCurrency];
+      renderTopGrid();
+      renderBottomGrid();
+      updateConversion();
+    });
+
+    // ----- scientific calculator (simple, same as before) -----
+    const sciInput = document.getElementById('sciInput');
+    let calcInput = '0';
+    let lastEval = false;
+
+    function renderSciButtons() {
+      const sciButtons = document.getElementById('sciButtons');
+      const buttons = [
+        'sin','cos','tan','log','√','^',
+        '7','8','9','/','π','e',
+        '4','5','6','*','(',' )',
+        '1','2','3','-','C','⌫',
+        '0','.','=','+'
+      ];
+      sciButtons.innerHTML = '';
+      buttons.forEach(cmd => {
+        const btn = document.createElement('button');
+        btn.className = 'sci-btn';
+        if (['sin','cos','tan','log','√','π','e','^','(',')','C','⌫'].includes(cmd)) btn.classList.add('fn');
+        if (['+','-','*','/','^'].includes(cmd)) btn.classList.add('operator');
+        if (cmd === '=') btn.classList.add('equals');
+        if (cmd === 'C') btn.classList.add('clear');
+        btn.textContent = cmd;
+        btn.addEventListener('click', () => handleSci(cmd));
+        sciButtons.appendChild(btn);
+      });
+    }
+
+    function handleSci(cmd) {
+      if (cmd === 'C') { calcInput = '0'; lastEval = false; }
+      else if (cmd === '⌫') { calcInput = calcInput.slice(0,-1) || '0'; }
+      else if (cmd === '=') {
+        try {
+          let expr = calcInput.replace(/π/g, 'Math.PI').replace(/e/g, 'Math.E').replace(/\^/g, '**').replace(/√/g, 'Math.sqrt');
+          expr = expr.replace(/sin/g, 'Math.sin').replace(/cos/g, 'Math.cos').replace(/tan/g, 'Math.tan').replace(/log/g, 'Math.log10');
+          const res = eval(expr);
+          calcInput = parseFloat(res).toString();
+          lastEval = true;
+        } catch { calcInput = 'Error'; }
+      } else {
+        if (lastEval && /\d|\./.test(cmd)) { calcInput = cmd; lastEval = false; }
+        else { if (calcInput === '0' && /[\d.]/.test(cmd)) calcInput = cmd; else calcInput += cmd; lastEval = false; }
+      }
+      sciInput.innerText = calcInput;
+    }
+
+    // ----- tab switching -----
+    const tabSci = document.getElementById('tabSci');
+    const tabCurr = document.getElementById('tabCurr');
+    const pageSci = document.getElementById('pageSci');
+    const pageCurr = document.getElementById('pageCurr');
+
+    tabSci.addEventListener('click', () => {
+      tabSci.classList.add('active');
+      tabCurr.classList.remove('active');
+      pageSci.classList.add('active-page');
+      pageCurr.classList.remove('active-page');
+    });
+
+    tabCurr.addEventListener('click', () => {
+      tabCurr.classList.add('active');
+      tabSci.classList.remove('active');
+      pageCurr.classList.add('active-page');
+      pageSci.classList.remove('active-page');
+      fetchRates(); // refresh when switching to currency
+    });
+
+    // ----- initialise everything -----
+    renderTopGrid();
+    renderBottomGrid();
+    renderSciButtons();
+    fetchRates();
+    updateConversion();
+
+    // auto-refresh rates every 60 sec if currency page active
+    setInterval(() => {
+      if (pageCurr.classList.contains('active-page')) fetchRates();
+    }, 60000);
+  })();
+</script>
+</body>
+</html>
